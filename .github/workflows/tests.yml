@@ -1,0 +1,36 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Checks the style, audits the formula, installs it from the npm tarball, and runs its test block.
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Set up Homebrew and the tap
+        uses: Homebrew/actions/setup-homebrew@main
+
+      - name: Check the style
+        run: brew style bnonni/tap
+
+      - name: Audit the formula
+        run: brew audit --strict --online bnonni/tap/create-ln-app
+
+      - name: Install the formula
+        run: brew install --build-from-source bnonni/tap/create-ln-app
+
+      - name: Test the formula
+        run: brew test bnonni/tap/create-ln-app

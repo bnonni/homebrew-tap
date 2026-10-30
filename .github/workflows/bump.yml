@@ -1,0 +1,48 @@
+name: bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: The create-ln-app version on npm, for example 1.6.0. If empty, the workflow uses the npm latest version.
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bump
+
+jobs:
+  # Sets the formula to a version on npm, installs and tests it, then pushes the change to main.
+  # A push with GITHUB_TOKEN does not start the tests workflow, so this job does the same checks before the push.
+  bump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Set up Homebrew and the tap
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          token: ${{ github.token }}
+
+      - name: Update the formula
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: .github/scripts/bump.sh "$INPUT_VERSION"
+
+      - name: Audit the formula
+        run: brew audit --strict --online bnonni/tap/create-ln-app
+
+      - name: Install the formula
+        run: brew install --build-from-source bnonni/tap/create-ln-app
+
+      - name: Test the formula
+        run: brew test bnonni/tap/create-ln-app
+
+      - name: Push the change
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit --all --message "create-ln-app $VERSION"
+          git push origin HEAD
