@@ -1,8 +1,8 @@
 class CreateLnApp < Formula
   desc "Make a Lightning app with a local regtest network"
   homepage "https://create-ln-app.dev"
-  url "https://registry.npmjs.org/create-ln-app/-/create-ln-app-1.5.0.tgz"
-  sha256 "bfe484077339b601303f92195876fdf863361c0956cc7e762cf966525b2a415c"
+  url "https://registry.npmjs.org/create-ln-app/-/create-ln-app-1.6.0.tgz"
+  sha256 "b910bc2656a7e3a0be00d1957e5a79f602640bbbbcdac1f33ea61e7cf1b460c5"
   license "MIT"
 
   depends_on "node"
